@@ -7,7 +7,7 @@ int main(void) {
 }
 
 void Run(void) {
-	int entryCount;
+	int* entryCount;
 	int choice;
 	Entry* EntryList = (Entry*)malloc(10 * sizeof(Entry));
 	
@@ -109,30 +109,97 @@ void systemListen() {
 	return;
 }
 
-void addEntry(void) {
+void addEntry(Entry** EntryList, int* entryCount) {
+	int nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck, int entryStatus;
+	char buffer[6][60];
+	Entry* newEntry = (Entry*)malloc(sizeof(Entry));
 	printf("Name: \n");
-	//Scan the stuff
-	//Validate it with a function for regex
-	//do a check if the Enter key was entered. If so, return and end program. 
+	fgets(buffer[1], 30, stdin);
+	nameCheck = validateName(buffer[1]);
+	enterCheck(buffer[1]);
+
 	printf("Street Address: \n");
-	//Scan the stuff
+	fgets(buffer[2], 60, stdin);
+	addressCheck = validateAddress(buffer[2]);
 	//Validate it with a function for regex
 	printf("City: \n");
-	//Scan the stuff
-	//Validate it with a function for regex
+	fgets(buffer[3], 60, stdin);
+	cityCheck = validateCity(buffer[3]);
 	printf("Province: \n");
-	//Scan the stuff
+	fgets(buffer[4], 2, stdin);
+	provinceCheck = validateProvince(buffer[4]);	
 	//Validate it with a function for regex
 	printf("Postal Code: \n");
-	//Scan the stuff
+	fgets(buffer[5], 7, stdin);
+	postalCheck = validatePostalCode(buffer[5]);
 	//Validate it with a function for regex
 	printf("Phone Number: \n");
-	//Scan the stuff
-	//Validate it with a function for regex
+	fgets(buffer[6], 12, stdin);
+	phoneCheck = validatePhone(buffer[6]);
 
 	//Call a function that takes in all the info and displays and gets a confirmation from the user
+	entryStatus = validateUserEntries(nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck);
 
-	//Append it to the array
+	//Confirm that none of the validation checks returned 1. If so, throw error and begin again.
+	if (entryStatus == 1) {
+		printf("One or more of the entries was invalid. Please try again.\n");
+		return;
+	}
+
+	//Append it to the new entry
+	strcpy(newEntry->name, buffer[1]);
+	strcpy(newEntry->address, buffer[2]);
+	strcpy(newEntry->city, buffer[3]);
+	strcpy(newEntry->province, buffer[4]);
+	strcpy(newEntry->postalCode, buffer[5]);
+	strcpy(newEntry->phone, buffer[6]);;
+
+	//Add it to the array
+	EntryList[*entryCount] = newEntry;	
 
 	//Increament the counter. 
+	*entryCount++;
+
+	//Testing here after regex library convo
+	printf("Name: %s\n", newEntry->name);	
+}
+
+bool validateName(char* buffer) {
+	//If it meets the request, return zero. If it doesn't, return 1.
+}
+
+bool validateAddress(char* address) {
+	//If it meets the request, return zero. If it doesn't, return 1.
+}
+
+bool validateCity(char* city) {
+	//If it meets the request, return zero. If it doesn't, return 1.
+}
+
+bool validateProvince(char* province) {
+	//If it meets the request, return zero. If it doesn't, return 1.
+}
+
+bool validatePostalCode(char* postalCode) {
+	//If it meets the request, return zero. If it doesn't, return 1.
+}
+
+bool validatePhone(char* phone) {
+	//If it meets the request, return zero. If it doesn't, return 1.
+}
+
+bool validateUserEntries(int nameCheck, int addressCheck, int cityCheck, int provinceCheck, int postalCheck, int phoneCheck) {
+	if (nameCheck == 1 && addressCheck == 1 && cityCheck == 1 && provinceCheck == 1 && postalCheck == 1 && phoneCheck == 1) {
+		return 0;
+	}
+	else {
+		return 1;
+	}
+}
+
+void enterCheck(char* buffer) {
+	if (buffer[1] == '\n') {
+		printf("Enter was pressed. Exiting program.");
+		exit(0);
+	}
 }
