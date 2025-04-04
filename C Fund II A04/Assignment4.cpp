@@ -2,7 +2,7 @@
 #include "assignment4.h"
 
 int main(void) {
-	printf("What's good playa? \n");
+	Run();
 	return 0;
 }
 
@@ -10,19 +10,28 @@ void Run(void) {
 	int* entryCount;
 	int choice;
 	Entry* EntryList = (Entry*)malloc(10 * sizeof(Entry));
+	while (1) {
+		mainMenu();
+		printf("Enter your choice: \n");
+		choice = GetValidIntegerInput();
+		switch (choice) {
+		case 1:
+			addEntry(&EntryList, entryCount);
+			break;
+		case 2:
+			//DisplayEntries(EntryList, entryCount);
+			break;
+		case 3:
+			printf("Exiting the program...\n");
+			free(EntryList);
+			return;
+		default:
+			printf("Invalid choice! Please try again.\n");
+			break;
+		}
+	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 //
@@ -110,7 +119,7 @@ void systemListen() {
 }
 
 void addEntry(Entry** EntryList, int* entryCount) {
-	int nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck, int entryStatus;
+	bool nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck, int entryStatus;
 	char buffer[6][60];
 	Entry* newEntry = (Entry*)malloc(sizeof(Entry));
 	printf("Name: \n");
@@ -121,18 +130,21 @@ void addEntry(Entry** EntryList, int* entryCount) {
 	printf("Street Address: \n");
 	fgets(buffer[2], 60, stdin);
 	addressCheck = validateAddress(buffer[2]);
-	//Validate it with a function for regex
+	
+
 	printf("City: \n");
 	fgets(buffer[3], 60, stdin);
 	cityCheck = validateCity(buffer[3]);
+
 	printf("Province: \n");
 	fgets(buffer[4], 2, stdin);
 	provinceCheck = validateProvince(buffer[4]);	
-	//Validate it with a function for regex
+
 	printf("Postal Code: \n");
 	fgets(buffer[5], 7, stdin);
 	postalCheck = validatePostalCode(buffer[5]);
-	//Validate it with a function for regex
+
+
 	printf("Phone Number: \n");
 	fgets(buffer[6], 12, stdin);
 	phoneCheck = validatePhone(buffer[6]);
@@ -165,31 +177,69 @@ void addEntry(Entry** EntryList, int* entryCount) {
 }
 
 bool validateName(char* buffer) {
-	//If it meets the request, return zero. If it doesn't, return 1.
+	std::regex nameRegex ("^[A-Za-z' -]{1,30}$");
+	if (std::regex_match(buffer, nameRegex)) {
+		return true;
+	}
+
+	else {
+		return false;
+	}
 }
 
 bool validateAddress(char* address) {
-	//If it meets the request, return zero. If it doesn't, return 1.
+	std::regex addressRegex("^.{1,60}$");
+	if (std::regex_match(address, addressRegex)) {
+		return true;
+	}
+
+	else {
+		return false;
+	}
 }
 
 bool validateCity(char* city) {
-	//If it meets the request, return zero. If it doesn't, return 1.
+	std::regex cityRegex("^[A-Za-z]{1,60}$");
+	if (std::regex_match(city, cityRegex)) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 bool validateProvince(char* province) {
-	//If it meets the request, return zero. If it doesn't, return 1.
+	std::regex provRegex("^[A-Z{2}$");
+	if (std::regex_match(province, provRegex)) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 bool validatePostalCode(char* postalCode) {
-	//If it meets the request, return zero. If it doesn't, return 1.
+	std::regex postalRegex("^[A-Z]\\d[A-Z] \\d[A-Z]\\d$");
+	if (std::regex_match(postalCode, postalRegex)) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 bool validatePhone(char* phone) {
-	//If it meets the request, return zero. If it doesn't, return 1.
+	std::regex phoneRegex("^\\d{3}-\\d{3}-\\d{4}$");
+	if (std::regex_match(phone, phoneRegex)) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
-bool validateUserEntries(int nameCheck, int addressCheck, int cityCheck, int provinceCheck, int postalCheck, int phoneCheck) {
-	if (nameCheck == 1 && addressCheck == 1 && cityCheck == 1 && provinceCheck == 1 && postalCheck == 1 && phoneCheck == 1) {
+bool validateUserEntries(bool nameCheck, bool addressCheck, bool cityCheck, bool provinceCheck, bool postalCheck, bool phoneCheck) {
+	if (nameCheck == true && addressCheck == true && cityCheck == true && provinceCheck == true && postalCheck == true && phoneCheck == true) {
 		return 0;
 	}
 	else {
@@ -199,7 +249,15 @@ bool validateUserEntries(int nameCheck, int addressCheck, int cityCheck, int pro
 
 void enterCheck(char* buffer) {
 	if (buffer[1] == '\n') {
-		printf("Enter was pressed. Exiting program.");
-		exit(0);
+		printf("Enter was pressed. Returning back to main menu....");
+		return;
 	}
+}
+
+void mainMenu(void) {
+	printf("========== MAIN MENU ==========\n");
+	printf("1. Add Entry\n");
+	printf("2. Display Entries\n");
+	printf("3. Exit the program\n");
+	printf("===============================\n");
 }
