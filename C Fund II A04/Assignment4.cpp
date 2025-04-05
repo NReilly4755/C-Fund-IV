@@ -1,4 +1,3 @@
-
 #include "assignment4.h"
 
 int main(void) {
@@ -7,19 +6,25 @@ int main(void) {
 }
 
 void Run(void) {
-	int* entryCount;
 	int choice;
+	int entryCount = 0;
 	Entry* EntryList = (Entry*)malloc(10 * sizeof(Entry));
+	if (EntryList == NULL) {
+		printf("Memory allocation failed!\n");
+		return;
+	}
+	InitializeEntryList(EntryList);
+
 	while (1) {
 		mainMenu();
 		printf("Enter your choice: \n");
 		choice = GetValidIntegerInput();
 		switch (choice) {
 		case 1:
-			addEntry(&EntryList, entryCount);
+			addEntry(&EntryList, &entryCount);
 			break;
 		case 2:
-			//DisplayEntries(EntryList, entryCount);
+			displayEntries(EntryList, entryCount);
 			break;
 		case 3:
 			printf("Exiting the program...\n");
@@ -30,35 +35,22 @@ void Run(void) {
 			break;
 		}
 	}
-	
 }
 
-
-//
-// FUNCTION   : GetValidIntegerInput     
-// DESCRIPTION: Makes sure that the input read from keyboard is a single int only between 1-6 inclusive  
-//                    
-// PARAMETERS : none     
-// RETURNS    : value, which is the number isolated and meets the range of 1-6 inclusive.     
-//
 int GetValidIntegerInput(void) {
-
 	// Declare the local variables
 	int value;
 	char buffer[100];
 
 	while (1) {
-
 		// Read the input from the user, make sure it is within bounds. 
 		if (fgets(buffer, sizeof(buffer), stdin)) {
-
 			// Use sscanf_s to parse the integer out of the input
 			if (sscanf_s(buffer, "%d", &value) == 1) {
-
-				// After parsing, initalize the pointer be equal to the buffer to get data.
+				// After parsing, initialize the pointer to be equal to the buffer to get data.
 				char* extra_char = buffer;
 
-				// Skip over the number if it is more, increament the extra counter
+				// Skip over the number if it is more, increment the extra counter
 				while (*extra_char >= '0' && *extra_char <= '9') {
 					extra_char++;
 				}
@@ -81,107 +73,184 @@ int GetValidIntegerInput(void) {
 	}
 }
 
-//
-// FUNCTION   : clearBuffer
-// DESCRIPTION: Consumes the newline character that is left in the buffer after scanf_s.
-//                    
-// PARAMETERS : none
-// RETURNS    : none
-//
 void clearBuffer() {
 	int c;
 	while ((c = getchar()) != '\n' && c != EOF);
 }
 
-//
-// FUNCTION   : clearConsole  
-// DESCRIPTION: Uses the Windows command prompt to clear the console screen.
-//                    
-// PARAMETERS : none
-// RETURNS    : none
-//
 void clearConsole() {
 	system("cls");
 }
 
-//
-// FUNCTION   : systemListen  
-// DESCRIPTION: To purposily lag the system when the user is prompted to enter 0 to go back to the main menu.
-//                    
-// PARAMETERS : none
-// RETURNS    : none
-//
 void systemListen() {
-	char* key;
+	int key;
 	printf("Enter 0 to go back to the main menu...");
 	scanf_s("%d", &key);
 	return;
 }
 
 void addEntry(Entry** EntryList, int* entryCount) {
-	bool nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck, int entryStatus;
-	char buffer[6][60];
-	Entry* newEntry = (Entry*)malloc(sizeof(Entry));
-	printf("Name: \n");
-	fgets(buffer[1], 30, stdin);
-	nameCheck = validateName(buffer[1]);
-	enterCheck(buffer[1]);
+	bool nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck, enterStatus;
+	char nameBuffer[31];
+	char addressBuffer[61];
+	char cityBuffer[61];
+	char provinceBuffer[4];
+	char postalBuffer[8];
+	char phoneBuffer[13];
+	int length;
+	clearConsole();
+	while (1) {
+		if (*entryCount >= 10) {
+			printf("Entry list is full. Cannot add more entries.\n");
+			return;
+		}
 
-	printf("Street Address: \n");
-	fgets(buffer[2], 60, stdin);
-	addressCheck = validateAddress(buffer[2]);
+		Entry* newEntry = (Entry*)malloc(sizeof(Entry));
+		if (newEntry == NULL) {
+			printf("Memory allocation failed!\n");
+			return;
+		}
+
+		// Name Entry
+		while (1) {
+			printf("Name: \n");
+			fgets(nameBuffer, 40, stdin);
+			nameBuffer[strcspn(nameBuffer, "\n")] = 0;
+			enterStatus = enterCheck(nameBuffer);
+			if (enterStatus) {
+				return;
+			}
+			nameCheck = validateName(nameBuffer);
+			if (!nameCheck) {
+				printf("Invalid name entry. Please try again.\n");
+			}
+			else {
+				break;
+			}
+
+			
+		}
+
+		// Street Address Entry
+		while (1) {
+			printf("Street Address: \n");
+			fgets(addressBuffer, 70, stdin);
+			addressBuffer[strcspn(addressBuffer, "\n")] = 0;
+			addressCheck = validateAddress(addressBuffer);
+			if (!addressCheck) {
+				printf("Invalid address format. Please try again.\n");
+			}
+			else {
+				break;
+			}
+		}
+
+		// City Entry
+		while (1) {
+			printf("City: \n");
+			fgets(cityBuffer, 70, stdin);
+			cityBuffer[strcspn(cityBuffer, "\n")] = 0;
+			cityCheck = validateCity(cityBuffer);
+			if (!cityCheck) {
+				printf("Invalid city format. Please try again.\n");
+			}
+			else {
+				break;
+			}
+		}
+
+		// Province Entry
+		while (1) {
+			printf("Province: \n");
+			fgets(provinceBuffer, 6, stdin);
+			provinceBuffer[strcspn(provinceBuffer, "\n")] = 0;
+			provinceCheck = validateProvince(provinceBuffer);
+			if (!provinceCheck){
+				printf("Invalid province format. Please try again.\n");
+				clearBuffer();
+			}
+			else {
+				break;
+			}
+		}
+		
+		// Postal Code Entry
+		while (1) {
+			printf("Postal Code: \n");
+			fgets(postalBuffer, 10, stdin);
+			length = strnlen_s(postalBuffer, 100);
+			postalBuffer[strcspn(postalBuffer, "\n")] = 0;
+			postalCheck = validatePostalCode(postalBuffer, length);
+			if (!postalCheck) {
+				printf("Invalid postal code format. Please try again.\n");
+			}
+			else {
+				break;
+			}
+		}
+
+
+		// Phone Number Entry
+		while (1) {
+			printf("Phone Number (###-###-####): \n");
+			fgets(phoneBuffer, 13, stdin);
+			clearBuffer();
+			phoneBuffer[strcspn(phoneBuffer, "\n")] = 0;
+			phoneCheck = validatePhone(phoneBuffer);
+			if (!phoneCheck) {
+				printf("Invalid phone number format. Please try again.\n");
+			}
+			else {
+				break;
+			}
+		}
+
+		// Confirm all validations pass
+		validateUserEntries(nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck);
+
+		// Copy data into new entry
+		strcpy_s(newEntry->name, sizeof(newEntry->name), nameBuffer);
+		strcpy_s(newEntry->address, sizeof(newEntry->address), addressBuffer);
+		strcpy_s(newEntry->city, sizeof(newEntry->city), cityBuffer);
+		strcpy_s(newEntry->province, sizeof(newEntry->province), provinceBuffer);
+		strcpy_s(newEntry->postalCode, sizeof(newEntry->postalCode), postalBuffer);
+		strcpy_s(newEntry->phone, sizeof(newEntry->phone), phoneBuffer);
+
+		// Add entry to the list
+		EntryList[*entryCount] = newEntry;
+		(*entryCount)++;  
+
+		// Testing output
+		printf("Entry Added:\n");
+		printf("Name: %s\n", newEntry->name);
+		printf("Address: %s\n", newEntry->address);
+		printf("City: %s\n", newEntry->city);
+		printf("Province: %s\n", newEntry->province);
+		printf("Postal Code: %s\n", newEntry->postalCode);
+		printf("Phone: %s\n", newEntry->phone);
+
+		printf("Entry count is now: %d\n", *entryCount);
+	}
+	}
 	
 
-	printf("City: \n");
-	fgets(buffer[3], 60, stdin);
-	cityCheck = validateCity(buffer[3]);
-
-	printf("Province: \n");
-	fgets(buffer[4], 2, stdin);
-	provinceCheck = validateProvince(buffer[4]);	
-
-	printf("Postal Code: \n");
-	fgets(buffer[5], 7, stdin);
-	postalCheck = validatePostalCode(buffer[5]);
-
-
-	printf("Phone Number: \n");
-	fgets(buffer[6], 12, stdin);
-	phoneCheck = validatePhone(buffer[6]);
-
-	//Call a function that takes in all the info and displays and gets a confirmation from the user
-	entryStatus = validateUserEntries(nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck);
-
-	//Confirm that none of the validation checks returned 1. If so, throw error and begin again.
-	if (entryStatus == 1) {
-		printf("One or more of the entries was invalid. Please try again.\n");
-		return;
+bool enterCheck(char* buffer) {
+	// Check if the name input is empty (only Enter key pressed)
+	if (buffer[0] == '\n' || strlen(buffer) == 0) {
+		printf("Enter was pressed without input. Returning to main menu...\n");
+		clearBuffer();
+		return true;
 	}
-
-	//Append it to the new entry
-	strcpy(newEntry->name, buffer[1]);
-	strcpy(newEntry->address, buffer[2]);
-	strcpy(newEntry->city, buffer[3]);
-	strcpy(newEntry->province, buffer[4]);
-	strcpy(newEntry->postalCode, buffer[5]);
-	strcpy(newEntry->phone, buffer[6]);;
-
-	//Add it to the array
-	EntryList[*entryCount] = newEntry;	
-
-	//Increament the counter. 
-	*entryCount++;
-
-	//Testing here after regex library convo
-	printf("Name: %s\n", newEntry->name);	
+	else {
+		return false;
+	}
 }
 
 bool validateName(char* buffer) {
-	std::regex nameRegex ("^[A-Za-z' -]{1,30}$");
+	std::regex nameRegex("^[A-Za-z' -]{1,30}$");
 	if (std::regex_match(buffer, nameRegex)) {
 		return true;
 	}
-
 	else {
 		return false;
 	}
@@ -192,7 +261,6 @@ bool validateAddress(char* address) {
 	if (std::regex_match(address, addressRegex)) {
 		return true;
 	}
-
 	else {
 		return false;
 	}
@@ -209,7 +277,7 @@ bool validateCity(char* city) {
 }
 
 bool validateProvince(char* province) {
-	std::regex provRegex("^[A-Z{2}$");
+	std::regex provRegex("^[A-Z]{2}$");
 	if (std::regex_match(province, provRegex)) {
 		return true;
 	}
@@ -218,8 +286,12 @@ bool validateProvince(char* province) {
 	}
 }
 
-bool validatePostalCode(char* postalCode) {
-	std::regex postalRegex("^[A-Z]\\d[A-Z] \\d[A-Z]\\d$");
+bool validatePostalCode(char* postalCode ,int length) {
+	std::regex postalRegex("^[A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]$");
+	if (length > 7 || length < 7) {
+		return false;
+	}
+
 	if (std::regex_match(postalCode, postalRegex)) {
 		return true;
 	}
@@ -238,19 +310,18 @@ bool validatePhone(char* phone) {
 	}
 }
 
-bool validateUserEntries(bool nameCheck, bool addressCheck, bool cityCheck, bool provinceCheck, bool postalCheck, bool phoneCheck) {
-	if (nameCheck == true && addressCheck == true && cityCheck == true && provinceCheck == true && postalCheck == true && phoneCheck == true) {
-		return 0;
+void validateUserEntries(bool nameCheck, bool addressCheck, bool cityCheck, bool provinceCheck, bool postalCheck, bool phoneCheck) {
+	if (nameCheck && addressCheck && cityCheck && provinceCheck && postalCheck && phoneCheck) {
+		printf("All entries are valid.\n");
 	}
 	else {
-		return 1;
-	}
-}
-
-void enterCheck(char* buffer) {
-	if (buffer[1] == '\n') {
-		printf("Enter was pressed. Returning back to main menu....");
-		return;
+		printf("You failed on these checks: \n");
+		printf("Name: %s\n", nameCheck ? "Valid" : "Invalid");
+		printf("Address: %s\n", addressCheck ? "Valid" : "Invalid");
+		printf("City: %s\n", cityCheck ? "Valid" : "Invalid");
+		printf("Province: %s\n", provinceCheck ? "Valid" : "Invalid");
+		printf("Postal Code: %s\n", postalCheck ? "Valid" : "Invalid");
+		printf("Phone Number: %s\n", phoneCheck ? "Valid" : "Invalid");
 	}
 }
 
@@ -260,4 +331,35 @@ void mainMenu(void) {
 	printf("2. Display Entries\n");
 	printf("3. Exit the program\n");
 	printf("===============================\n");
+}
+
+void displayEntries(Entry* EntryList, int entryCount) {
+	if (entryCount == 0) {
+		printf("No entries to display.\n");
+		return;
+	}
+	printf("========== ENTRY LIST ==========\n");
+	for (int i = 0; i < entryCount; i++) {
+		printf("Entry %d:\n", i + 1);
+		printf("Name: %s\n", EntryList[i].name);
+		printf("Address: %s\n", EntryList[i].address);
+		printf("City: %s\n", EntryList[i].city);
+		printf("Province: %s\n", EntryList[i].province);
+		printf("Postal Code: %s\n", EntryList[i].postalCode);
+		printf("Phone: %s\n", EntryList[i].phone);
+		printf("===============================\n");
+		systemListen();
+		clearBuffer();
+		}
+	}
+
+void InitializeEntryList(Entry* EntryList) {
+	for (int i = 0; i < 10; i++) {
+		strcpy_s(EntryList[i].name, sizeof(EntryList[i].name), "");
+		strcpy_s(EntryList[i].address, sizeof(EntryList[i].address), "");
+		strcpy_s(EntryList[i].city, sizeof(EntryList[i].city), "");
+		strcpy_s(EntryList[i].province, sizeof(EntryList[i].province), "");
+		strcpy_s(EntryList[i].postalCode, sizeof(EntryList[i].postalCode), "");
+		strcpy_s(EntryList[i].phone, sizeof(EntryList[i].phone), "");
+	}
 }
