@@ -1,3 +1,12 @@
+/*
+* FILE		    : Assignemnt4.cpp
+* PROJECT	    : SENG 1050 Assignment 4
+* PROGRAMMER	: NICHOLAS REILLY
+* FIRST VERSION	: 2025-04-02
+* DESCRIPTION	: A program that allows the user to enter and validate personal information such as name, address, city, province, postal code, and phone number. The program also provides a menu for adding entries and displaying them.
+* REFERENCING   : Deitel, P., & Deitel, H. (2016). How to Program in C and C++ (8th ed.). Deitel & Associates Inc.
+*/
+
 #include "assignment4.h"
 
 int main(void) {
@@ -5,6 +14,13 @@ int main(void) {
 	return 0;
 }
 
+//
+// FUNCTION   : Run 
+// DESCRIPTION: Acts as the main function that runs the program
+//                    
+// PARAMETERS : none. 
+// RETURNS    : none.   
+//
 void Run(void) {
 	int choice;
 	int entryCount = 0;
@@ -37,6 +53,12 @@ void Run(void) {
 	}
 }
 
+//
+// FUNCTION   : GetValidIntegerInput
+// DESCRIPTION: Reads an integer input from the user and validates it.
+// PARAMETERS : none.
+// RETURNS    : int - the valid integer input from the user.
+//
 int GetValidIntegerInput(void) {
 	// Declare the local variables
 	int value;
@@ -73,15 +95,30 @@ int GetValidIntegerInput(void) {
 	}
 }
 
+//
+// FUNCTION   : clearBuffer
+// DESCRIPTION: Clears the input buffer to remove any unwanted characters.
+// PARAMETERS : none.
+// RETURNS    : none.
 void clearBuffer() {
 	int c;
 	while ((c = getchar()) != '\n' && c != EOF);
 }
 
+//
+// FUNCTION   : clearConsole
+// DESCRIPTION: Clears the console screen.
+// PARAMETERS : none.
+// RETURNS    : none.
 void clearConsole() {
 	system("cls");
 }
 
+//
+// FUNCTION   : systemListen
+// DESCRIPTION: Waits for the user to press Enter before continuing.
+// PARAMETERS : none.
+// RETURNS    : none.
 void systemListen() {
 	int key;
 	printf("Enter 0 to go back to the main menu...");
@@ -89,25 +126,31 @@ void systemListen() {
 	return;
 }
 
+//
+// FUNCTION   : addEntry
+// DESCRIPTION: Adds a new entry to the entry list after validating user input.
+// PARAMETERS : EntryList - pointer to the list of entries
+//              entryCount - pointer to the number of entries in the list
+// RETURNS    : none.
 void addEntry(Entry* EntryList, int* entryCount) {
     bool nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck, enterStatus;
-    char nameBuffer[32];       // 31 + null
-    char addressBuffer[61];    // 60 + null
-    char cityBuffer[61];       // 60 + null
-    char provinceBuffer[4];    // 2 + newline + null
-    char postalBuffer[9];      // 7 + null
-    char phoneBuffer[14];      // 12 + newline + null
+    char nameBuffer[32];       
+    char addressBuffer[61];    
+    char cityBuffer[61];       
+    char provinceBuffer[4];    
+    char postalBuffer[9];      
+    char phoneBuffer[14];      
     int length;
     clearConsole();
 
-    // Ensure we don't exceed the maximum number of entries (10)
+    //First check to make sure there are not any more than 10 user entries
     while (1) {
         if (*entryCount >= 10) {
             printf("Entry list is full. Cannot add more entries.\n");
             return;
         }
 
-        // Name Entry
+        //Name Entry code
         while (1) {
             printf("Name (Alphabetical, 30 MAX): \n");
             if (fgets(nameBuffer, sizeof(nameBuffer), stdin) == NULL) {
@@ -138,10 +181,12 @@ void addEntry(Entry* EntryList, int* entryCount) {
             }
         }
 
-        // Street Address Entry
+        //Street Address Entry code
         while (1) {
             printf("Street Address (Alphanumerical, 60 MAX): \n");
-            if (fgets(addressBuffer, sizeof(addressBuffer), stdin) == NULL) continue;
+            if (fgets(addressBuffer, sizeof(addressBuffer), stdin) == NULL) {
+                continue;
+            }
             if (strchr(addressBuffer, '\n') == NULL) {
                 printf("Input too long. Max 60 characters allowed.\n");
                 clearBuffer();
@@ -162,10 +207,12 @@ void addEntry(Entry* EntryList, int* entryCount) {
             }
         }
 
-        // City Entry
+        //City Entry code
         while (1) {
             printf("City (Alphabetical, 60 MAX): \n");
-            if (fgets(cityBuffer, sizeof(cityBuffer), stdin) == NULL) continue;
+            if (fgets(cityBuffer, sizeof(cityBuffer), stdin) == NULL) {
+                continue;
+            }
             if (strchr(cityBuffer, '\n') == NULL) {
                 printf("Input too long. Max 60 characters allowed.\n");
                 clearBuffer();
@@ -186,10 +233,12 @@ void addEntry(Entry* EntryList, int* entryCount) {
             }
         }
 
-        // Province Entry
+        //Province Entry code
         while (1) {
             printf("Province: \n");
-            if (fgets(provinceBuffer, sizeof(provinceBuffer), stdin) == NULL) continue;
+            if (fgets(provinceBuffer, sizeof(provinceBuffer), stdin) == NULL) {
+                continue;
+            }
             if (strchr(provinceBuffer, '\n') == NULL) {
                 printf("Input too long. Max 2 characters allowed.\n");
                 clearBuffer();
@@ -210,27 +259,23 @@ void addEntry(Entry* EntryList, int* entryCount) {
             }
         }
 
-        // Postal Code Entry
+        //Postal Code Entry code
         while (1) {
             printf("Postal Code (LNL NLN): \n");
-            if (fgets(postalBuffer, sizeof(postalBuffer), stdin) == NULL) continue;
-
-            // Check overflow before trimming newline
+            if (fgets(postalBuffer, sizeof(postalBuffer), stdin) == NULL) {
+                continue;
+            }
             if (strchr(postalBuffer, '\n') == NULL) {
                 printf("Input too long. Max 7 characters allowed (e.g., A1A 1A1).\n");
                 clearBuffer();
                 continue;
             }
-
-            // Trim newline BEFORE measuring length
             postalBuffer[strcspn(postalBuffer, "\n")] = '\0';
             length = strlen(postalBuffer);
-
             if (length > 7) {
                 printf("Postal code too long. Max 7 characters.\n");
                 continue;
             }
-
             postalCheck = validatePostalCode(postalBuffer, length);
             if (!postalCheck) {
                 printf("Invalid postal code format. Please try again.\n");
@@ -240,10 +285,12 @@ void addEntry(Entry* EntryList, int* entryCount) {
             }
         }
 
-        // Phone Number Entry
+        //Phone Number Entry
         while (1) {
             printf("Phone Number (###-###-####): \n");
-            if (fgets(phoneBuffer, sizeof(phoneBuffer), stdin) == NULL) continue;
+            if (fgets(phoneBuffer, sizeof(phoneBuffer), stdin) == NULL) {
+                continue;
+            }
             if (strchr(phoneBuffer, '\n') == NULL) {
                 printf("Input too long. Max 12 characters (###-###-####).\n");
                 clearBuffer();
@@ -264,10 +311,10 @@ void addEntry(Entry* EntryList, int* entryCount) {
             }
         }
 
-        // Confirm all validations pass
+        //Confirm all validations pass
         validateUserEntries(nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck);
 
-        // Add data to the list
+        //Add data to the list
         strcpy_s(EntryList[*entryCount].name, sizeof(EntryList[*entryCount].name), nameBuffer);
         strcpy_s(EntryList[*entryCount].address, sizeof(EntryList[*entryCount].address), addressBuffer);
         strcpy_s(EntryList[*entryCount].city, sizeof(EntryList[*entryCount].city), cityBuffer);
@@ -275,16 +322,16 @@ void addEntry(Entry* EntryList, int* entryCount) {
         strcpy_s(EntryList[*entryCount].postalCode, sizeof(EntryList[*entryCount].postalCode), postalBuffer);
         strcpy_s(EntryList[*entryCount].phone, sizeof(EntryList[*entryCount].phone), phoneBuffer);
 
-        // Increment entry count
+        //Increment entry count
         (*entryCount)++;
     }
 }
 
-
-
-
-	
-
+//
+// FUNCTION   : enterCheck
+// DESCRIPTION: Checks if the Enter key was pressed without any input.
+// PARAMETERS : buffer - the input buffer
+// RETURNS    : true if Enter was pressed without input, false otherwise.
 bool enterCheck(char* buffer) {
 	// Check if the name input is empty (only Enter key pressed)
 	if (buffer[0] == '\n' || strlen(buffer) == 0) {
@@ -297,6 +344,11 @@ bool enterCheck(char* buffer) {
 	}
 }
 
+//
+// FUNCTION   : validateName
+// DESCRIPTION: Validates the name input using regex.
+// PARAMETERS : buffer - the name input buffer
+// RETURNS    : true if valid, false otherwise.
 bool validateName(char* buffer) {
 	std::regex nameRegex("^[A-Za-z' -]{1,30}$");
 	if (std::regex_match(buffer, nameRegex)) {
@@ -306,7 +358,11 @@ bool validateName(char* buffer) {
 		return false;
 	}
 }
-
+//
+// FUNCTION   : validateAddress
+// DESCRIPTION: Validates the address input using regex.
+// PARAMETERS : address - the address input buffer
+// RETURNS    : true if valid, false otherwise.
 bool validateAddress(char* address) {
 	std::regex addressRegex("^.{1,60}$");
 	if (std::regex_match(address, addressRegex)) {
@@ -317,6 +373,11 @@ bool validateAddress(char* address) {
 	}
 }
 
+//
+// FUNCTION   : validateCity
+// DESCRIPTION: Validates the city input using regex.
+// PARAMETERS : city - the city input buffer
+// RETURNS    : true if valid, false otherwise.
 bool validateCity(char* city) {
 	std::regex cityRegex("^[A-Za-z]{1,60}$");
 	if (std::regex_match(city, cityRegex)) {
@@ -327,6 +388,11 @@ bool validateCity(char* city) {
 	}
 }
 
+//
+// FUNCTION   : validateProvince
+// DESCRIPTION: Validates the province input using regex.
+// PARAMETERS : province - the province input buffer
+// RETURNS    : true if valid, false otherwise.
 bool validateProvince(char* province) {
 	std::regex provRegex("^[A-Z]{2}$");
 	if (std::regex_match(province, provRegex)) {
@@ -337,6 +403,12 @@ bool validateProvince(char* province) {
 	}
 }
 
+//
+// FUNCTION   : validatePostalCode
+// DESCRIPTION: Validates the postal code input using regex.
+// PARAMETERS : postalCode - the postal code input buffer
+//              length - the length of the postal code
+// RETURNS    : true if valid, false otherwise.
 bool validatePostalCode(char* postalCode ,int length) {
 	std::regex postalRegex("^[A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]$");
 	if (length > 7 || length < 7) {
@@ -351,6 +423,11 @@ bool validatePostalCode(char* postalCode ,int length) {
 	}
 }
 
+//
+// FUNCTION   : validatePhone
+// DESCRIPTION: Validates the phone number input using regex.
+// PARAMETERS : phone - the phone number input buffer
+// RETURNS    : true if valid, false otherwise.
 bool validatePhone(char* phone) {
 	std::regex phoneRegex("^\\d{3}-\\d{3}-\\d{4}$");
 	if (std::regex_match(phone, phoneRegex)) {
@@ -361,6 +438,16 @@ bool validatePhone(char* phone) {
 	}
 }
 
+//
+// FUNCTION   : validateUserEntries
+// DESCRIPTION: Validates all user entries and prints the results.
+// PARAMETERS : nameCheck - result of name validation
+//              addressCheck - result of address validation
+//              cityCheck - result of city validation
+//              provinceCheck - result of province validation
+//              postalCheck - result of postal code validation
+//              phoneCheck - result of phone number validation
+// RETURNS    : none.
 void validateUserEntries(bool nameCheck, bool addressCheck, bool cityCheck, bool provinceCheck, bool postalCheck, bool phoneCheck) {
 	if (nameCheck && addressCheck && cityCheck && provinceCheck && postalCheck && phoneCheck) {
 		printf("All entries are valid.\n");
@@ -376,6 +463,11 @@ void validateUserEntries(bool nameCheck, bool addressCheck, bool cityCheck, bool
 	}
 }
 
+//
+// FUNCTION   : mainMenu
+// DESCRIPTION: Displays the main menu options to the user.
+// PARAMETERS : none.
+// RETURNS    : none.
 void mainMenu(void) {
 	clearConsole();
 	printf("========== MAIN MENU ==========\n");
@@ -385,6 +477,12 @@ void mainMenu(void) {
 	printf("===============================\n");
 }
 
+//
+// FUNCTION   : displayEntries
+// DESCRIPTION: Displays all entries in the entry list.
+// PARAMETERS : EntryList - pointer to the list of entries
+//              entryCount - the number of entries in the list
+// RETURNS    : none.
 void displayEntries(Entry* EntryList, int entryCount) {
 	if (entryCount == 0) {
 		printf("No entries to display.\n");
@@ -405,6 +503,11 @@ void displayEntries(Entry* EntryList, int entryCount) {
 		}
 	}
 
+//
+// FUNCTION   : InitializeEntryList
+// DESCRIPTION: Initializes the entry list by setting all fields to empty strings.
+// PARAMETERS : EntryList - pointer to the list of entries
+// RETURNS    : none.
 void InitializeEntryList(Entry* EntryList) {
 	for (int i = 0; i < 10; i++) {
 		strcpy_s(EntryList[i].name, sizeof(EntryList[i].name), "");

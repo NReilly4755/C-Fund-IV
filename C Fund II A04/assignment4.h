@@ -1,10 +1,21 @@
+/*
+* FILE			: assignment4.h
+* PROJECT		: SENG 1050 Assignment 4
+* PROGRAMMER	: NICHOLAS REILLY
+* FIRST VERSION	: 2025-04-02
+* DESCRIPTION	: A program that allows the user to enter and validate personal information such as name, address, city, province, postal code, and phone number. The program also provides a menu for adding entries and displaying them.
+* REFERENCING   : Deitel, P., & Deitel, H. (2016). How to Program in C and C++ (8th ed.). Deitel & Associates Inc.
+*/
+
 #pragma once
 
+//Libraries used
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>	
 #include <regex>
 
+//Struct declaration for Entry
 typedef struct {
 	char name[32];
 	char address[62];
@@ -14,7 +25,7 @@ typedef struct {
 	char phone[14];
 } Entry;
 
-
+//Function prototypes
 void Run(void);
 int GetValidIntegerInput(void);
 void systemListen(void);
