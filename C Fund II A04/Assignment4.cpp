@@ -21,7 +21,7 @@ void Run(void) {
 		choice = GetValidIntegerInput();
 		switch (choice) {
 		case 1:
-			addEntry(&EntryList, &entryCount);
+			addEntry(EntryList, &entryCount);
 			break;
 		case 2:
 			displayEntries(EntryList, entryCount);
@@ -89,149 +89,200 @@ void systemListen() {
 	return;
 }
 
-void addEntry(Entry** EntryList, int* entryCount) {
-	bool nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck, enterStatus;
-	char nameBuffer[31];
-	char addressBuffer[61];
-	char cityBuffer[61];
-	char provinceBuffer[4];
-	char postalBuffer[8];
-	char phoneBuffer[13];
-	int length;
-	clearConsole();
-	while (1) {
-		if (*entryCount >= 10) {
-			printf("Entry list is full. Cannot add more entries.\n");
-			return;
-		}
+void addEntry(Entry* EntryList, int* entryCount) {
+    bool nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck, enterStatus;
+    char nameBuffer[32];       // 31 + null
+    char addressBuffer[61];    // 60 + null
+    char cityBuffer[61];       // 60 + null
+    char provinceBuffer[4];    // 2 + newline + null
+    char postalBuffer[9];      // 7 + null
+    char phoneBuffer[14];      // 12 + newline + null
+    int length;
+    clearConsole();
 
-		Entry* newEntry = (Entry*)malloc(sizeof(Entry));
-		if (newEntry == NULL) {
-			printf("Memory allocation failed!\n");
-			return;
-		}
+    // Ensure we don't exceed the maximum number of entries (10)
+    while (1) {
+        if (*entryCount >= 10) {
+            printf("Entry list is full. Cannot add more entries.\n");
+            return;
+        }
 
-		// Name Entry
-		while (1) {
-			printf("Name: \n");
-			fgets(nameBuffer, 40, stdin);
-			nameBuffer[strcspn(nameBuffer, "\n")] = 0;
-			enterStatus = enterCheck(nameBuffer);
-			if (enterStatus) {
-				return;
-			}
-			nameCheck = validateName(nameBuffer);
-			if (!nameCheck) {
-				printf("Invalid name entry. Please try again.\n");
-			}
-			else {
-				break;
-			}
+        // Name Entry
+        while (1) {
+            printf("Name (Alphabetical, 30 MAX): \n");
+            if (fgets(nameBuffer, sizeof(nameBuffer), stdin) == NULL) {
+                printf("Error reading name. Try again.\n");
+                continue;
+            }
+            if (strchr(nameBuffer, '\n') == NULL) {
+                printf("Input too long. Max 31 characters allowed.\n");
+                clearBuffer();
+                continue;
+            }
+            nameBuffer[strcspn(nameBuffer, "\n")] = '\0';
+            length = strlen(nameBuffer);
+            if (length > 31) {
+                printf("Name too long. Max 31 characters allowed.\n");
+                continue;
+            }
+            enterStatus = enterCheck(nameBuffer);
+            if (enterStatus) {
+                return;
+            }
+            nameCheck = validateName(nameBuffer);
+            if (!nameCheck) {
+                printf("Invalid name entry. Please try again.\n");
+            }
+            else {
+                break;
+            }
+        }
 
-			
-		}
+        // Street Address Entry
+        while (1) {
+            printf("Street Address (Alphanumerical, 60 MAX): \n");
+            if (fgets(addressBuffer, sizeof(addressBuffer), stdin) == NULL) continue;
+            if (strchr(addressBuffer, '\n') == NULL) {
+                printf("Input too long. Max 60 characters allowed.\n");
+                clearBuffer();
+                continue;
+            }
+            addressBuffer[strcspn(addressBuffer, "\n")] = '\0';
+            length = strlen(addressBuffer);
+            if (length > 60) {
+                printf("Address too long. Max 60 characters allowed.\n");
+                continue;
+            }
+            addressCheck = validateAddress(addressBuffer);
+            if (!addressCheck) {
+                printf("Invalid address format. Please try again.\n");
+            }
+            else {
+                break;
+            }
+        }
 
-		// Street Address Entry
-		while (1) {
-			printf("Street Address: \n");
-			fgets(addressBuffer, 70, stdin);
-			addressBuffer[strcspn(addressBuffer, "\n")] = 0;
-			addressCheck = validateAddress(addressBuffer);
-			if (!addressCheck) {
-				printf("Invalid address format. Please try again.\n");
-			}
-			else {
-				break;
-			}
-		}
+        // City Entry
+        while (1) {
+            printf("City (Alphabetical, 60 MAX): \n");
+            if (fgets(cityBuffer, sizeof(cityBuffer), stdin) == NULL) continue;
+            if (strchr(cityBuffer, '\n') == NULL) {
+                printf("Input too long. Max 60 characters allowed.\n");
+                clearBuffer();
+                continue;
+            }
+            cityBuffer[strcspn(cityBuffer, "\n")] = '\0';
+            length = strlen(cityBuffer);
+            if (length > 60) {
+                printf("City name too long. Max 60 characters allowed.\n");
+                continue;
+            }
+            cityCheck = validateCity(cityBuffer);
+            if (!cityCheck) {
+                printf("Invalid city format. Please try again.\n");
+            }
+            else {
+                break;
+            }
+        }
 
-		// City Entry
-		while (1) {
-			printf("City: \n");
-			fgets(cityBuffer, 70, stdin);
-			cityBuffer[strcspn(cityBuffer, "\n")] = 0;
-			cityCheck = validateCity(cityBuffer);
-			if (!cityCheck) {
-				printf("Invalid city format. Please try again.\n");
-			}
-			else {
-				break;
-			}
-		}
+        // Province Entry
+        while (1) {
+            printf("Province: \n");
+            if (fgets(provinceBuffer, sizeof(provinceBuffer), stdin) == NULL) continue;
+            if (strchr(provinceBuffer, '\n') == NULL) {
+                printf("Input too long. Max 2 characters allowed.\n");
+                clearBuffer();
+                continue;
+            }
+            provinceBuffer[strcspn(provinceBuffer, "\n")] = '\0';
+            length = strlen(provinceBuffer);
+            if (length != 2) {
+                printf("Province must be 2 characters.\n");
+                continue;
+            }
+            provinceCheck = validateProvince(provinceBuffer);
+            if (!provinceCheck) {
+                printf("Invalid province format. Please try again.\n");
+            }
+            else {
+                break;
+            }
+        }
 
-		// Province Entry
-		while (1) {
-			printf("Province: \n");
-			fgets(provinceBuffer, 6, stdin);
-			provinceBuffer[strcspn(provinceBuffer, "\n")] = 0;
-			provinceCheck = validateProvince(provinceBuffer);
-			if (!provinceCheck){
-				printf("Invalid province format. Please try again.\n");
-				clearBuffer();
-			}
-			else {
-				break;
-			}
-		}
-		
-		// Postal Code Entry
-		while (1) {
-			printf("Postal Code: \n");
-			fgets(postalBuffer, 10, stdin);
-			length = strnlen_s(postalBuffer, 100);
-			postalBuffer[strcspn(postalBuffer, "\n")] = 0;
-			postalCheck = validatePostalCode(postalBuffer, length);
-			if (!postalCheck) {
-				printf("Invalid postal code format. Please try again.\n");
-			}
-			else {
-				break;
-			}
-		}
+        // Postal Code Entry
+        while (1) {
+            printf("Postal Code (LNL NLN): \n");
+            if (fgets(postalBuffer, sizeof(postalBuffer), stdin) == NULL) continue;
+
+            // Check overflow before trimming newline
+            if (strchr(postalBuffer, '\n') == NULL) {
+                printf("Input too long. Max 7 characters allowed (e.g., A1A 1A1).\n");
+                clearBuffer();
+                continue;
+            }
+
+            // Trim newline BEFORE measuring length
+            postalBuffer[strcspn(postalBuffer, "\n")] = '\0';
+            length = strlen(postalBuffer);
+
+            if (length > 7) {
+                printf("Postal code too long. Max 7 characters.\n");
+                continue;
+            }
+
+            postalCheck = validatePostalCode(postalBuffer, length);
+            if (!postalCheck) {
+                printf("Invalid postal code format. Please try again.\n");
+            }
+            else {
+                break;
+            }
+        }
+
+        // Phone Number Entry
+        while (1) {
+            printf("Phone Number (###-###-####): \n");
+            if (fgets(phoneBuffer, sizeof(phoneBuffer), stdin) == NULL) continue;
+            if (strchr(phoneBuffer, '\n') == NULL) {
+                printf("Input too long. Max 12 characters (###-###-####).\n");
+                clearBuffer();
+                continue;
+            }
+            phoneBuffer[strcspn(phoneBuffer, "\n")] = '\0';
+            length = strlen(phoneBuffer);
+            if (length != 12) {
+                printf("Phone number must be 12 characters (###-###-####).\n");
+                continue;
+            }
+            phoneCheck = validatePhone(phoneBuffer);
+            if (!phoneCheck) {
+                printf("Invalid phone number format. Please try again.\n");
+            }
+            else {
+                break;
+            }
+        }
+
+        // Confirm all validations pass
+        validateUserEntries(nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck);
+
+        // Add data to the list
+        strcpy_s(EntryList[*entryCount].name, sizeof(EntryList[*entryCount].name), nameBuffer);
+        strcpy_s(EntryList[*entryCount].address, sizeof(EntryList[*entryCount].address), addressBuffer);
+        strcpy_s(EntryList[*entryCount].city, sizeof(EntryList[*entryCount].city), cityBuffer);
+        strcpy_s(EntryList[*entryCount].province, sizeof(EntryList[*entryCount].province), provinceBuffer);
+        strcpy_s(EntryList[*entryCount].postalCode, sizeof(EntryList[*entryCount].postalCode), postalBuffer);
+        strcpy_s(EntryList[*entryCount].phone, sizeof(EntryList[*entryCount].phone), phoneBuffer);
+
+        // Increment entry count
+        (*entryCount)++;
+    }
+}
 
 
-		// Phone Number Entry
-		while (1) {
-			printf("Phone Number (###-###-####): \n");
-			fgets(phoneBuffer, 13, stdin);
-			clearBuffer();
-			phoneBuffer[strcspn(phoneBuffer, "\n")] = 0;
-			phoneCheck = validatePhone(phoneBuffer);
-			if (!phoneCheck) {
-				printf("Invalid phone number format. Please try again.\n");
-			}
-			else {
-				break;
-			}
-		}
 
-		// Confirm all validations pass
-		validateUserEntries(nameCheck, addressCheck, cityCheck, provinceCheck, postalCheck, phoneCheck);
 
-		// Copy data into new entry
-		strcpy_s(newEntry->name, sizeof(newEntry->name), nameBuffer);
-		strcpy_s(newEntry->address, sizeof(newEntry->address), addressBuffer);
-		strcpy_s(newEntry->city, sizeof(newEntry->city), cityBuffer);
-		strcpy_s(newEntry->province, sizeof(newEntry->province), provinceBuffer);
-		strcpy_s(newEntry->postalCode, sizeof(newEntry->postalCode), postalBuffer);
-		strcpy_s(newEntry->phone, sizeof(newEntry->phone), phoneBuffer);
-
-		// Add entry to the list
-		EntryList[*entryCount] = newEntry;
-		(*entryCount)++;  
-
-		// Testing output
-		printf("Entry Added:\n");
-		printf("Name: %s\n", newEntry->name);
-		printf("Address: %s\n", newEntry->address);
-		printf("City: %s\n", newEntry->city);
-		printf("Province: %s\n", newEntry->province);
-		printf("Postal Code: %s\n", newEntry->postalCode);
-		printf("Phone: %s\n", newEntry->phone);
-
-		printf("Entry count is now: %d\n", *entryCount);
-	}
-	}
 	
 
 bool enterCheck(char* buffer) {
@@ -326,6 +377,7 @@ void validateUserEntries(bool nameCheck, bool addressCheck, bool cityCheck, bool
 }
 
 void mainMenu(void) {
+	clearConsole();
 	printf("========== MAIN MENU ==========\n");
 	printf("1. Add Entry\n");
 	printf("2. Display Entries\n");
@@ -348,8 +400,8 @@ void displayEntries(Entry* EntryList, int entryCount) {
 		printf("Postal Code: %s\n", EntryList[i].postalCode);
 		printf("Phone: %s\n", EntryList[i].phone);
 		printf("===============================\n");
-		systemListen();
-		clearBuffer();
+		printf("Press Enter to see the next entry...\n");
+		getchar();
 		}
 	}
 

@@ -11,8 +11,9 @@ typedef struct {
 	char city[62];
 	char province[4];
 	char postalCode[9];
-	char phone[15];
+	char phone[14];
 } Entry;
+
 
 void Run(void);
 int GetValidIntegerInput(void);
@@ -20,7 +21,7 @@ void systemListen(void);
 void clearBuffer(void);
 void clearConsole(void);
 void mainMenu(void);
-void addEntry(Entry** EntryList, int* entryCount);
+void addEntry(Entry* EntryList, int* entryCount);
 bool validateName(char* buffer);
 bool validateAddress(char* address);
 bool validateCity(char* city);
